@@ -1,0 +1,19 @@
+{
+  "name": "learn-chat-master",
+  "version": "1.0.0",
+  "description": "first medium level chat app",
+  "keywords": [
+    "chat-app"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gssprincesahu/"
+  },
+  "license": "ISC",
+  "author": "prince sahu",
+  "type": "ES Modules.",
+  "main": "index.js",
+  "scripts": {
+    "test": "yarn i"
+  }
+}

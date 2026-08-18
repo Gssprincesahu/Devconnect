@@ -11,7 +11,7 @@
   },
   "license": "ISC",
   "author": "prince sahu",
-  "type": "ES Modules.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "yarn i"

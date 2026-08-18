@@ -46,9 +46,11 @@ io.on('connection', (socket) => {
     console.log('New client connected');
 
     // Send existing messages to new client
+    
     socket.emit('mostRecentmessage', messages);
 
     // Handle new chat messages
+
     socket.on('newChatMessage', (messageData) => {
         messages.push(messageData);
         io.emit('newChatMessage', messageData);

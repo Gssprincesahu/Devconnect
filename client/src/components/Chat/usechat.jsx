@@ -1,29 +1,60 @@
-import { useEffect , useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import socketIOClient from "socket.io-client";
+
+const SOCKET_SERVER_URL = "http://localhost:5000";
+
 const usechat = () => {
-    const socketRef = useRef();
-    const [messages, setMessages] = useState([]);
+  const socketRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
 
-    useEffect(() => {
-        socketRef.current = socketIOClient("http://localhost:5000");
+  useEffect(() => {
+    try {
+      socketRef.current = socketIOClient(SOCKET_SERVER_URL, {
+        reconnectionAttempts: 5,
+        timeout: 5000
+      });
 
-        socketRef.current.on("mostRecentmessage", (mostRecentmessage) => {
-            setMessages([...mostRecentmessage]);
-        });
+      socketRef.current.on("connect", () => {
+        setIsConnected(true);
+      });
 
-        socketRef.current.on("newChatMessage", ({user_name , avatar, message_text}) => {
-            setMessages(messages => [...messages, {user_name: user_name , avatar:avatar, message_text: message_text}]);
-        });
-        return () => {
-            socketRef.current.disconnect();
+      socketRef.current.on("disconnect", () => {
+        setIsConnected(false);
+      });
+
+      socketRef.current.on("mostRecentmessage", (mostRecentmessage) => {
+        if (Array.isArray(mostRecentmessage)) {
+          setMessages([...mostRecentmessage]);
         }
-    }, []);
+      });
 
-    const sendMessage = (message) => {
-        socketRef.current.emit("newChatMessage", message);
+      socketRef.current.on("newChatMessage", (messageData) => {
+        if (messageData) {
+          setMessages(prev => [...prev, messageData]);
+        }
+      });
+    } catch (err) {
+      console.warn("Socket.io connection warning:", err);
     }
 
-    return { messages, sendMessage };
-}
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  const sendMessage = (messageData) => {
+    if (socketRef.current && socketRef.current.connected) {
+      socketRef.current.emit("newChatMessage", messageData);
+    } else {
+      // Local fallback append if socket server is offline during dev mode
+      setMessages(prev => [...prev, messageData]);
+    }
+  };
+
+  return { messages, sendMessage, isConnected };
+};
 
 export default usechat;

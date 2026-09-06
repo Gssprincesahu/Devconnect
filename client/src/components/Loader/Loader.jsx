@@ -1,13 +1,12 @@
 import React from "react";
-import "./Loader.css";
 
 export default function Loader({ type = "threeBounce" }) {
     return (
-        <div className="loader-container">
-            <div className="loader">
-                <div className="bounce1"></div>
-                <div className="bounce2"></div>
-                <div className="bounce3"></div>
+        <div className="flex justify-center items-center h-screen w-full">
+            <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 bg-indigo-600 rounded-full animate-bounce [animation-delay:-0.32s]"></div>
+                <div className="w-4 h-4 bg-indigo-600 rounded-full animate-bounce [animation-delay:-0.16s]"></div>
+                <div className="w-4 h-4 bg-indigo-600 rounded-full animate-bounce"></div>
             </div>
         </div>
     );

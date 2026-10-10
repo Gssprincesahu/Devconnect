@@ -38,6 +38,7 @@ export default function Article({ currentUser, onSelectArticle, activeArticle, s
   const featuredArticle = filteredArticles[0];
   const regularArticles = filteredArticles.slice(1);
 
+
   if (activeArticle) {
     return (
       <ArticleDetail

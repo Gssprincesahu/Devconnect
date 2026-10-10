@@ -45,15 +45,20 @@ let messages = [];
 io.on('connection', (socket) => {
     console.log('New client connected');
 
-    // Send existing messages to new client
-    
-    socket.emit('mostRecentmessage', messages);
+    socket.on('identify', ({ userName }) => {
+        if (!userName) return;
+        socket.join(`user:${userName}`);
+        const history = messages.filter((message) => message.sender === userName || message.recipient === userName);
+        socket.emit('mostRecentmessage', history);
+    });
 
     // Handle new chat messages
 
-    socket.on('newChatMessage', (messageData) => {
-        messages.push(messageData);
-        io.emit('newChatMessage', messageData);
+    socket.on('directMessage', (messageData) => {
+        if (!messageData?.sender || !messageData?.recipient || !messageData?.message_text) return;
+        const message = { ...messageData, timestamp: messageData.timestamp || new Date().toISOString() };
+        messages.push(message);
+        io.to(`user:${message.sender}`).to(`user:${message.recipient}`).emit('newChatMessage', message);
     });
 
     socket.on('disconnect', () => {

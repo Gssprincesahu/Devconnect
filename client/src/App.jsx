@@ -7,6 +7,8 @@ import Article from "./components/Article/Article.jsx";
 import CreateArticle from "./components/Article/CreateArticle.jsx";
 import Chat from "./components/Chat/Chat.jsx";
 import LoginPage from "./components/Login/LoginPage.jsx";
+import Profile from "./components/Profile/Profile.jsx";
+import Assistant from "./components/Assistant/Assistant.jsx";
 
 export default function App() {
   const [userData, setUserData] = useState("");
@@ -124,6 +126,9 @@ export default function App() {
               setSelectedChatRecipient={setSelectedChatRecipient}
             />
           )}
+
+          {view === "profile" && <Profile userData={userData} setView={setView} />}
+          {view === "assistant" && <Assistant userData={userData} />}
         </main>
       </div>
     </div>

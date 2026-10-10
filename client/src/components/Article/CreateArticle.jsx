@@ -9,6 +9,8 @@ export default function CreateArticle({ onPublish, currentUser }) {
   const [tags, setTags] = useState("");
   const [cover, setCover] = useState(null);
   const [isPublished, setIsPublished] = useState(false);
+  const [visibility, setVisibility] = useState("Public");
+  const [draftSaved, setDraftSaved] = useState(false);
 
   const categories = [
     "DSA",
@@ -35,6 +37,22 @@ export default function CreateArticle({ onPublish, currentUser }) {
     setTags("");
     setCover(null);
     setIsPublished(false);
+    setDraftSaved(false);
+  };
+
+  const articlePayload = (status) => ({
+    id: "art-user-" + Date.now(), title: title.trim() || "Untitled draft", subtitle: subtitle.trim(), body: body.trim(),
+    category: category || "Web Development", tags: tags.split(",").map(t => t.trim()).filter(Boolean),
+    cover: cover || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
+    author: { name: currentUser?.user_name || "Mentor", avatar: currentUser?.user_avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80", role: "DevConnect Mentor" },
+    readTime: Math.max(3, Math.ceil((body.trim().split(/\s+/).filter(Boolean).length || 1) / 150)) + " min read", visibility, status,
+    date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }), likes: 0, bookmarks: 0, comments: []
+  });
+
+  const saveDraft = () => {
+    const drafts = JSON.parse(localStorage.getItem("article-drafts") || "[]");
+    localStorage.setItem("article-drafts", JSON.stringify([articlePayload("draft"), ...drafts]));
+    setDraftSaved(true);
   };
 
   const publish = (e) => {
@@ -44,25 +62,7 @@ export default function CreateArticle({ onPublish, currentUser }) {
       return;
     }
 
-    const article = {
-      id: "art-user-" + Date.now(),
-      title: title.trim(),
-      subtitle: subtitle.trim(),
-      body: body.trim(),
-      category: category || "Web Development",
-      tags: tags.split(",").map(t => t.trim()).filter(Boolean),
-      cover: cover || "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80",
-      author: {
-        name: currentUser?.user_name || "Mentor",
-        avatar: currentUser?.user_avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80",
-        role: "DevConnect Mentor"
-      },
-      readTime: Math.max(3, Math.ceil(body.split(" ").length / 150)) + " min read",
-      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
-      likes: 0,
-      bookmarks: 0,
-      comments: []
-    };
+    const article = articlePayload("published");
 
     // Save to localStorage
     const existing = JSON.parse(localStorage.getItem("articles") || "[]");
@@ -101,6 +101,7 @@ export default function CreateArticle({ onPublish, currentUser }) {
           <span>Article published successfully and saved to your community feed!</span>
         </div>
       )}
+      {draftSaved && !isPublished && <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm font-semibold">Draft saved locally. You can continue writing or publish when ready.</div>}
 
       {/* Main Form */}
       <form onSubmit={publish} className="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-10 shadow-soft space-y-6">
@@ -148,6 +149,13 @@ export default function CreateArticle({ onPublish, currentUser }) {
               {categories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Visibility</label>
+            <select value={visibility} onChange={e => setVisibility(e.target.value)} className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+              <option>Public</option><option>Followers only</option><option>Unlisted</option>
             </select>
           </div>
 
@@ -226,6 +234,8 @@ export default function CreateArticle({ onPublish, currentUser }) {
             <RotateCcw className="w-4 h-4" />
             <span>Reset Form</span>
           </button>
+
+          <button type="button" onClick={saveDraft} className="px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl transition-colors cursor-pointer">Save Draft</button>
 
           <button
             type="submit"

@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Users, BookOpen, MessageSquare, LogOut, Code2, Sparkles, ShieldCheck } from "lucide-react";
+import { Home, Users, BookOpen, MessageSquare, LogOut, Code2, Sparkles, ShieldCheck, UserRound, Bot } from "lucide-react";
 import PromoCard from "./PromoCard";
 
 export default function Sidebar({ currentView, setView, userData, onLogout, isMobileOpen, setIsMobileOpen }) {
@@ -7,7 +7,9 @@ export default function Sidebar({ currentView, setView, userData, onLogout, isMo
     { id: "home", label: "Home", icon: Home },
     { id: "mentors", label: "Mentors", icon: Users },
     { id: "articles", label: "Articles", icon: BookOpen },
-    { id: "messages", label: "Messages", icon: MessageSquare }
+    { id: "messages", label: "Messages", icon: MessageSquare },
+    { id: "profile", label: "My Profile", icon: UserRound }
+    ,{ id: "assistant", label: "DevGuide AI", icon: Bot }
   ];
 
   return (

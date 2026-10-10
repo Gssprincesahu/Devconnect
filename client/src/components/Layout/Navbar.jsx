@@ -12,6 +12,10 @@ export default function Navbar({ currentView, setIsMobileOpen, userData }) {
         return "Technical Articles";
       case "messages":
         return "Direct Messages";
+      case "profile":
+        return "Developer Profile";
+      case "assistant":
+        return "DevGuide AI";
       default:
         return "DevConnect";
     }

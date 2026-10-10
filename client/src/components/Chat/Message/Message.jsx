@@ -25,7 +25,7 @@ export default function Message({ messages, currentUser, activeConversation }) {
   return (
     <div className="space-y-4 max-w-4xl mx-auto pb-4">
       {messages.map((m, index) => {
-        const isMe = currentUser && m.user_name === currentUser;
+        const isMe = currentUser && (m.sender === currentUser || m.user_name === currentUser);
         return (
           <div
             key={index}
@@ -37,12 +37,12 @@ export default function Message({ messages, currentUser, activeConversation }) {
                 {m.avatar ? (
                   <img
                     src={m.avatar}
-                    alt={m.user_name}
+                    alt={m.sender || m.user_name}
                     className="w-8 h-8 rounded-full object-cover border border-slate-200"
                   />
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">
-                    {m.user_name?.charAt(0)?.toUpperCase() || "U"}
+                    {(m.sender || m.user_name)?.charAt(0)?.toUpperCase() || "U"}
                   </div>
                 )}
               </div>
@@ -61,7 +61,7 @@ export default function Message({ messages, currentUser, activeConversation }) {
               {/* User Name (if recipient) */}
               {!isMe && (
                 <div className="text-[11px] font-bold text-slate-500">
-                  {m.user_name}
+                  {m.sender || m.user_name}
                 </div>
               )}
 

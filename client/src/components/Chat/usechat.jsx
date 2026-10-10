@@ -3,7 +3,7 @@ import socketIOClient from "socket.io-client";
 
 const SOCKET_SERVER_URL = "http://localhost:5000";
 
-const usechat = () => {
+const usechat = (userName) => {
   const socketRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -17,6 +17,7 @@ const usechat = () => {
 
       socketRef.current.on("connect", () => {
         setIsConnected(true);
+        if (userName) socketRef.current.emit("identify", { userName });
       });
 
       socketRef.current.on("disconnect", () => {
@@ -43,11 +44,11 @@ const usechat = () => {
         socketRef.current.disconnect();
       }
     };
-  }, []);
+  }, [userName]);
 
   const sendMessage = (messageData) => {
     if (socketRef.current && socketRef.current.connected) {
-      socketRef.current.emit("newChatMessage", messageData);
+      socketRef.current.emit("directMessage", messageData);
     } else {
       // Local fallback append if socket server is offline during dev mode
       setMessages(prev => [...prev, messageData]);

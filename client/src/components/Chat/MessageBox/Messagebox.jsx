@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Send, Smile, Paperclip, Image as ImageIcon } from "lucide-react";
 
-export default function MessageBox({ userData, sendMessage }) {
+export default function MessageBox({ userData, recipient, sendMessage }) {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -12,6 +12,8 @@ export default function MessageBox({ userData, sendMessage }) {
 
     const messageData = {
       user_name: userData.user_name || "Developer",
+      sender: userData.user_name || "Developer",
+      recipient,
       avatar: userData.user_avatar,
       message_text: message.trim(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })

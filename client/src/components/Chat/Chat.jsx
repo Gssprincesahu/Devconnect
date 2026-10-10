@@ -6,7 +6,7 @@ import { initialConversations } from "../../data/mockData";
 import { Search, ArrowLeft, ShieldCheck, Circle, Phone, Video, Info, UserPlus, Sparkles } from "lucide-react";
 
 export default function Chat({ CurrentuserData, selectedChatRecipient, setSelectedChatRecipient }) {
-  const { messages, sendMessage, isConnected } = usechat();
+  const { messages, sendMessage, isConnected } = usechat(CurrentuserData?.user_name);
   const [searchFilter, setSearchFilter] = useState("");
   const [activeUser, setActiveUser] = useState(selectedChatRecipient || "Rahul Sharma");
   const [showMobileChat, setShowMobileChat] = useState(false);
@@ -38,11 +38,12 @@ export default function Chat({ CurrentuserData, selectedChatRecipient, setSelect
 
     // Process socket/history messages
     messages.forEach(m => {
-      if (m.user_name && m.user_name !== CurrentuserData?.user_name) {
-        const existing = map.get(m.user_name) || {};
-        map.set(m.user_name, {
+      const otherPerson = m.sender === CurrentuserData?.user_name ? m.recipient : m.sender || m.user_name;
+      if (otherPerson && otherPerson !== CurrentuserData?.user_name) {
+        const existing = map.get(otherPerson) || {};
+        map.set(otherPerson, {
           ...existing,
-          user_name: m.user_name,
+          user_name: otherPerson,
           avatar: m.avatar || existing.avatar,
           role: existing.role || "DevConnect Member",
           online: true,
@@ -84,7 +85,9 @@ export default function Chat({ CurrentuserData, selectedChatRecipient, setSelect
   // Filter messages for active chat session
   const activeMessages = useMemo(() => {
     return messages.filter(
-      m => m.user_name === activeUser || m.user_name === CurrentuserData?.user_name
+      m => (m.sender === CurrentuserData?.user_name && m.recipient === activeUser) ||
+        (m.sender === activeUser && m.recipient === CurrentuserData?.user_name) ||
+        (!m.sender && (m.user_name === activeUser || m.user_name === CurrentuserData?.user_name))
     );
   }, [messages, activeUser, CurrentuserData]);
 
@@ -253,6 +256,7 @@ export default function Chat({ CurrentuserData, selectedChatRecipient, setSelect
         <div className="p-4 bg-white border-t border-slate-200/80 shrink-0">
           <MessageBox
             userData={CurrentuserData}
+            recipient={activeUser}
             sendMessage={(msg) => sendMessage(msg)}
           />
         </div>
